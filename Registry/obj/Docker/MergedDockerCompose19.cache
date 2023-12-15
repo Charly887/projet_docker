@@ -1,0 +1,154 @@
+name: dockercompose14309235279572015274
+services:
+  neo4j:
+    environment:
+      NEO4J_AUTH: neo4j/You_Are_Mine
+    image: neo4j:latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 7474
+        published: "7474"
+        protocol: tcp
+      - mode: ingress
+        target: 7687
+        published: "7687"
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: neo4j-data
+        target: /data
+        volume: {}
+  redis:
+    image: redis:latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 6379
+        published: "6379"
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: redis-data
+        target: /data
+        volume: {}
+  registry:
+    build:
+      context: C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry
+      dockerfile: Registry/Dockerfile
+      labels:
+        com.microsoft.created-by: visual-studio
+        com.microsoft.visual-studio.project-name: Registry
+      target: base
+    container_name: Registry_1
+    depends_on:
+      neo4j:
+        condition: service_started
+        required: true
+      redis:
+        condition: service_started
+        required: true
+    entrypoint:
+      - tail
+      - -f
+      - /dev/null
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS: "true"
+      ASPNETCORE_URLS: https://+:443;http://+:80
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      NUGET_FALLBACK_PACKAGES: ""
+    image: registry:dev
+    labels:
+      com.microsoft.visualstudio.debuggee.arguments: ' --additionalProbingPath /.nuget/packages  "/app/bin/Debug/net6.0/Registry.dll"'
+      com.microsoft.visualstudio.debuggee.killprogram: /bin/sh -c "if PID=$$(pidof dotnet); then kill $$PID; fi"
+      com.microsoft.visualstudio.debuggee.program: dotnet
+      com.microsoft.visualstudio.debuggee.workingdirectory: /app
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 80
+        protocol: tcp
+      - mode: ingress
+        target: 80
+        published: "80"
+        protocol: tcp
+      - mode: ingress
+        target: 443
+        protocol: tcp
+    tty: true
+    volumes:
+      - type: bind
+        source: C:\Users\DELL\.nuget\packages\
+        target: /.nuget/packages
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\HotReload
+        target: /HotReloadAgent
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Sdks\Microsoft.Docker.Sdk\tools\HotReloadProxy\linux-x64\net6.0
+        target: /HotReloadProxy
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Sdks\Microsoft.Docker.Sdk\tools\TokenService.Proxy\linux-x64\net6.0
+        target: /TokenService.Proxy
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry
+        target: /app
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\DELL\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\DELL\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\DELL\vsdbg\vs2017u5
+        target: /remote_debugger
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\DELL\AppData\Roaming/ASP.NET/Https
+        target: /root/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\DELL\AppData\Roaming/Microsoft/UserSecrets
+        target: /root/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry
+        target: /src
+        bind:
+          create_host_path: true
+networks:
+  default:
+    name: dockercompose14309235279572015274_default
+volumes:
+  neo4j-data:
+    name: dockercompose14309235279572015274_neo4j-data
+  redis-data:
+    name: dockercompose14309235279572015274_redis-data

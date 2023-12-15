@@ -1,0 +1,128 @@
+﻿@page "/"
+@using Neo4jClient;
+@using Registry.Models;
+@using Neo4j.Driver;
+@using StackExchange.Redis;
+@inject IConfiguration Configuration;
+
+<h3 class="mt-4 mb-4">Formulaire d'enregistrement</h3>
+
+<div class="container">
+    <EditForm Model="@person" OnValidSubmit="SubmitForm">
+        <DataAnnotationsValidator />
+
+        <div class="form-group">
+            <label for="Name">Nom:</label>
+            <InputText id="Name" class="form-control" @bind-Value="person.Name" />
+            <ValidationMessage For="@(() => person.Name)" />
+        </div>
+
+        <div class="form-group">
+            <label for="Surname">Prénom:</label>
+            <InputText id="Surname" class="form-control" @bind-Value="person.Surname" />
+            <ValidationMessage For="@(() => person.Surname)" />
+        </div>
+
+        <div class="form-group">
+            <label for="Sex">Sexe:</label>
+            <InputText id="Sex" class="form-control" @bind-Value="person.Sex" />
+            <ValidationMessage For="@(() => person.Sex)" />
+        </div>
+
+        <div class="form-group">
+            <label for="Age">Âge:</label>
+            <InputNumber id="Age" class="form-control" @bind-Value="person.Age" />
+            <ValidationMessage For="@(() => person.Age)" />
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-4">
+                    <button type="submit" class="btn btn-primary">Envoyer</button>
+                </div>
+            </div>
+        </div>
+    
+
+    <!-- Ajout de la section de recherche par sexe -->
+    <div class="mt-4">
+        <h4>Rechercher selon le sexe</h4>
+        <div class="form-group">
+            <label for="SearchSex">Sexe:</label>
+            <InputText id="SearchSex" class="form-control" @bind-Value="searchSex" />
+        </div>
+        <div class="form-group">
+            <button class="btn btn-info" @onclick="RetrieveBySex">Récupérer</button>
+        </div>
+    </div>
+    </EditForm>
+    <!-- Affichage des résultats de la recherche -->
+    <div>
+        @if (peopleBySex != null && peopleBySex.Any())
+        {
+            <h4>Résultats de la recherche</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Prénom</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var surname in peopleBySex)
+                    {
+                        <tr>
+                            <td>@surname</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@code {
+    private Person person = new Person();
+    private List<string> peopleBySex = new List<string>(); // Pour stocker les résultats de la recherche
+    private string searchSex;
+
+    private async Task SubmitForm()
+    {
+        // Enregistrement dans Neo4j
+        using (var driver = GraphDatabase.Driver(Configuration["Neo4jSettings:Uri"],
+                                                 AuthTokens.Basic(Configuration["Neo4jSettings:Username"],
+                                                                  Configuration["Neo4jSettings:Password"])))
+        using (var session = driver.AsyncSession(o => o.WithDatabase("neo4j")))
+        {
+            await session.WriteTransactionAsync(async transaction =>
+            {
+                await transaction.RunAsync("CREATE (p:Person {Surname: $surname, Sex: $sex, Age: $age})",
+                                           new { surname = person.Surname, sex = person.Sex, age = person.Age });
+            });
+        }
+
+        // Enregistrement dans Redis
+        var redis = ConnectionMultiplexer.Connect(Configuration["RedisSettings:ConnectionString"]);
+        var database = redis.GetDatabase();
+        await database.StringSetAsync(person.Name.ToString(), person.Sex);
+    }
+
+    private async Task RetrieveBySex()
+    {
+        // Récupérer les prénoms des personnes par sexe depuis Neo4j
+        using (var driver = GraphDatabase.Driver(Configuration["Neo4jSettings:Uri"],
+                                                 AuthTokens.Basic(Configuration["Neo4jSettings:Username"],
+                                                                  Configuration["Neo4jSettings:Password"])))
+        using (var session = driver.AsyncSession(o => o.WithDatabase("neo4j")))
+        {
+            var cypherQuery = "MATCH (p:Person) WHERE p.Sex = $sex RETURN p.Surname";
+            var result = await session.ReadTransactionAsync(async transaction =>
+            {
+                var cursor = await transaction.RunAsync(cypherQuery, new { sex = searchSex });
+                return await cursor.ToListAsync();
+            });
+
+            // Convertir les résultats en une liste de prénoms
+            peopleBySex = result.Select(record => record["p.Surname"].As<string>()).ToList();
+        }
+    }
+}

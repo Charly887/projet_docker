@@ -1,0 +1,13 @@
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\Registry.exe
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\appsettings.Development.json
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\appsettings.json
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\Registry.dll
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\Registry.deps.json
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\Registry.runtimeconfig.json
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\Registry.pdb
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\Neo4j.Driver.dll
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\Neo4jClient.dll
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\Newtonsoft.Json.dll
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\Pipelines.Sockets.Unofficial.dll
+C:\Users\DELL\OneDrive - ensiie.fr\Bureau\2A\ProjetNoSql\Registry\Registry\obj\Docker\publish\StackExchange.Redis.dll

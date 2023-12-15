@@ -1,0 +1,33 @@
+version: '3.4'
+
+services:
+  registry:
+    image: ${DOCKER_REGISTRY-}registry
+    build:
+      context: .
+      dockerfile: Registry/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - neo4j
+      - redis
+
+  neo4j:
+    image: neo4j:latest
+    environment:
+      NEO4J_AUTH: neo4j/You_Are_Mine
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j-data:/data
+
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+volumes:
+  neo4j-data:
+  redis-data:
