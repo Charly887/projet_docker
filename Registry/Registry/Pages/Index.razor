@@ -114,7 +114,7 @@
                                                                   Configuration["Neo4jSettings:Password"])))
         using (var session = driver.AsyncSession(o => o.WithDatabase("neo4j")))
         {
-            var cypherQuery = "MATCH (p:Person) WHERE p.Sex = $sex RETURN p.Surname";
+            var cypherQuery = "MATCH (p:Person) WHERE p.Sex = $sex RETURN DISTINCT p.Surname";
             var result = await session.ReadTransactionAsync(async transaction =>
             {
                 var cursor = await transaction.RunAsync(cypherQuery, new { sex = searchSex });
